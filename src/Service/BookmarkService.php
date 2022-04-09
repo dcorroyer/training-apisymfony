@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Bookmark;
 use Doctrine\ORM\EntityManagerInterface;
+use Embed\Embed;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +35,7 @@ class BookmarkService
     }
 
     /**
-     * Funtion to get the bookmarks list
+     * Function to get the bookmarks list
      *
      * @param Request $request
      *
@@ -81,6 +82,14 @@ class BookmarkService
      */
     public function createBookmark(Request $request): JsonResponse
     {
+//        $embed = new Embed();
+//
+//        $info = $embed->get('https://vimeo.com/76979871');
+//
+//        $oembed = $info->getOEmbed();
+//
+//        dump($oembed->all());die();
+
         $bookmark = $this->serializer->deserialize($request->getContent(), Bookmark::class, "json");
 
         $this->manager->persist($bookmark);
