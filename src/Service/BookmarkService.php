@@ -34,6 +34,8 @@ class BookmarkService
     }
 
     /**
+     * Funtion to get the bookmarks list
+     *
      * @param Request $request
      *
      * @return JsonResponse
@@ -51,6 +53,8 @@ class BookmarkService
     }
 
     /**
+     * Function to get a single bookmark
+     *
      * @param Request $request
      * @param $id
      *
@@ -69,16 +73,30 @@ class BookmarkService
     }
 
     /**
+     * Function to add a bookmark to the Bookmark list
+     *
      * @param Request $request
      *
      * @return JsonResponse
      */
     public function createBookmark(Request $request): JsonResponse
     {
-        //TODO: Create function
+        $bookmark = $this->serializer->deserialize($request->getContent(), Bookmark::class, "json");
+
+        $this->manager->persist($bookmark);
+        $this->manager->flush();
+
+        return new JsonResponse(
+            $this->serializer->serialize($bookmark, 'json', ['groups' => 'document_list']),
+            Response::HTTP_CREATED,
+            [],
+            true,
+        );
     }
 
     /**
+     * Function to delete a single bookmark
+     *
      * @param Request $request
      * @param $id
      *
