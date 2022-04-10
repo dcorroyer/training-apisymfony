@@ -54,9 +54,10 @@ class BookmarkService
     public function listBookmarks(Request $request): JsonResponse
     {
         $bookmarkRepository = $this->manager->getRepository(Bookmark::class);
+        $bookmarks          = $bookmarkRepository->findAll();
 
         return new JsonResponse(
-            $this->serializer->serialize($bookmarkRepository->findAll(), 'json', ['groups' => 'bookmark_list']),
+            $this->serializer->serialize($bookmarks, 'json', ['groups' => 'bookmark_list']),
             Response::HTTP_OK,
             [],
             true,
@@ -74,13 +75,20 @@ class BookmarkService
     public function getBookmark(Request $request, $id): JsonResponse
     {
         $bookmarkRepository = $this->manager->getRepository(Bookmark::class);
+        $bookmark           = $bookmarkRepository->find($id);
 
-        return new JsonResponse(
-            $this->serializer->serialize($bookmarkRepository->find($id), 'json', ['groups' => 'bookmark_item']),
-            Response::HTTP_OK,
-            [],
-            true,
-        );
+        if ($bookmark) {
+            return new JsonResponse(
+                $this->serializer->serialize($bookmark, 'json', ['groups' => 'bookmark_item']),
+                Response::HTTP_OK,
+                [],
+                true,
+            );
+        }
+
+        return new JsonResponse([
+            'error' => 'Bookmark not found'
+        ], Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -92,18 +100,25 @@ class BookmarkService
      */
     public function createBookmark(Request $request): JsonResponse
     {
-        $url      = $this->serializer->deserialize($request->getContent(), Bookmark::class, 'json');
-        $bookmark = $this->bookmarkEmbedService->getBookmarkFieldsFromUrl($url);
+        $url = $this->serializer->deserialize($request->getContent(), Bookmark::class, 'json');
 
-        $this->manager->persist($bookmark);
-        $this->manager->flush();
+        if (preg_match('/^(http|https):\/\/(www.)?flickr|vimeo.com/', $url->getUrl()) === 1) {
+            $bookmark = $this->bookmarkEmbedService->getBookmarkFieldsFromUrl($url);
 
-        return new JsonResponse(
-            $this->serializer->serialize($bookmark, 'json', ['groups' => 'bookmark_item']),
-            Response::HTTP_CREATED,
-            [],
-            true,
-        );
+            $this->manager->persist($bookmark);
+            $this->manager->flush();
+
+            return new JsonResponse(
+                $this->serializer->serialize($bookmark, 'json', ['groups' => 'bookmark_item']),
+                Response::HTTP_CREATED,
+                [],
+                true,
+            );
+        }
+
+        return new JsonResponse([
+            'error' => 'The link you sent is not provided by Vimeo or Flickr'
+        ], Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -119,14 +134,20 @@ class BookmarkService
         $bookmarkRepository = $this->manager->getRepository(Bookmark::class);
         $bookmark           = $bookmarkRepository->find($id);
 
-        $this->manager->remove($bookmark);
-        $this->manager->flush();
+        if ($bookmark) {
+            $this->manager->remove($bookmark);
+            $this->manager->flush();
 
-        return new JsonResponse(
-            $this->serializer->serialize($bookmark, 'json', ['groups' => 'bookmark_item']),
-            Response::HTTP_OK,
-            [],
-            true,
-        );
+            return new JsonResponse(
+                $this->serializer->serialize($bookmark, 'json', ['groups' => 'bookmark_item']),
+                Response::HTTP_OK,
+                [],
+                true,
+            );
+        }
+
+        return new JsonResponse([
+            'error' => "Cannot delete the Bookmark $id, Bookmark not found"
+        ], Response::HTTP_NOT_FOUND);
     }
 }
