@@ -6,6 +6,7 @@ use App\Entity\Bookmark;
 use App\Entity\Traits\BookmarkDimensionsTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -17,6 +18,7 @@ class BookmarkVideo extends Bookmark
     /**
      * @ORM\Column(type="float", nullable=true)
      * @Groups("bookmark_item")
+     * @Assert\GreaterThan(value="0", message="Duration cannot be less than 0")
      */
     private ?float $duration = null;
 

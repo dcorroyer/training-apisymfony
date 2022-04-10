@@ -6,6 +6,7 @@ use App\Repository\BookmarkRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=BookmarkRepository::class)
@@ -28,42 +29,51 @@ class Bookmark
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"bookmark_list", "bookmark_item"})
+     * @Assert\NotBlank()
      */
     private string $url;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"bookmark_list", "bookmark_item"})
+     * @Assert\NotBlank()
      */
     private string $provider;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"bookmark_list", "bookmark_item"})
+     * @Assert\NotBlank()
      */
     private string $type;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"bookmark_list", "bookmark_item"})
+     * @Assert\NotBlank()
      */
     private string $title;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"bookmark_list", "bookmark_item"})
+     * @Assert\NotBlank()
      */
     private string $author;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups("bookmark_item")
+     * @Assert\NotBlank()
+     * @Assert\DateTime()
      */
     private DateTime $publishedAt;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups("bookmark_item")
+     * @Assert\NotBlank()
+     * @Assert\DateTime()
      */
     private DateTime $createdAt;
 

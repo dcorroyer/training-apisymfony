@@ -4,18 +4,23 @@ namespace App\Entity\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 trait BookmarkDimensionsTrait
 {
     /**
      * @ORM\Column(type="float")
      * @Groups("bookmark_item")
+     * @Assert\NotBlank()
+     * @Assert\GreaterThan(value="0", message="Height cannot be less than 0")
      */
     private float $height;
 
     /**
      * @ORM\Column(type="float")
      * @Groups("bookmark_item")
+     * @Assert\NotBlank()
+     * @Assert\GreaterThan(value="0", message="Width cannot be less than 0")
      */
     private float $width;
 
