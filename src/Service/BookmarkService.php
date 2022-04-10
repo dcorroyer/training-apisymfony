@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Bookmark;
 use Doctrine\ORM\EntityManagerInterface;
-use Embed\Embed;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,15 +22,26 @@ class BookmarkService
     protected SerializerInterface $serializer;
 
     /**
+     * @var BookmarkEmbedService
+     */
+    protected BookmarkEmbedService $bookmarkEmbedService;
+
+    /**
      * bookmarkService constructor.
      *
      * @param EntityManagerInterface $manager
      * @param SerializerInterface $serializer
+     * @param BookmarkEmbedService $bookmarkEmbedService
      */
-    public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer)
+    public function __construct(
+        EntityManagerInterface $manager,
+        SerializerInterface $serializer,
+        BookmarkEmbedService $bookmarkEmbedService
+    )
     {
-        $this->manager    = $manager;
-        $this->serializer = $serializer;
+        $this->manager              = $manager;
+        $this->serializer           = $serializer;
+        $this->bookmarkEmbedService = $bookmarkEmbedService;
     }
 
     /**
@@ -82,21 +92,14 @@ class BookmarkService
      */
     public function createBookmark(Request $request): JsonResponse
     {
-//        $embed = new Embed();
-//
-//        $info = $embed->get('https://vimeo.com/76979871');
-//
-//        $oembed = $info->getOEmbed();
-//
-//        dump($oembed->all());die();
-
-        $bookmark = $this->serializer->deserialize($request->getContent(), Bookmark::class, "json");
+        $url      = $this->serializer->deserialize($request->getContent(), Bookmark::class, 'json');
+        $bookmark = $this->bookmarkEmbedService->getBookmarkFieldsFromUrl($url);
 
         $this->manager->persist($bookmark);
         $this->manager->flush();
 
         return new JsonResponse(
-            $this->serializer->serialize($bookmark, 'json', ['groups' => 'document_list']),
+            $this->serializer->serialize($bookmark, 'json', ['groups' => 'bookmark_item']),
             Response::HTTP_CREATED,
             [],
             true,

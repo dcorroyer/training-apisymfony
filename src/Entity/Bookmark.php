@@ -9,9 +9,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BookmarkRepository::class)
+ * @ORM\Table(name="bookmark")
+ * @ORM\InheritanceType("SINGLE_TABLE")
  */
 class Bookmark
 {
+    const BOOKMARK_IMAGE = 'photo';
+    const BOOKMARK_VIDEO = 'video';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -31,6 +36,12 @@ class Bookmark
      * @Groups({"bookmark_list", "bookmark_item"})
      */
     private string $provider;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"bookmark_list", "bookmark_item"})
+     */
+    private string $type;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -105,6 +116,26 @@ class Bookmark
     public function setProvider(string $provider): self
     {
         $this->provider = $provider;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
