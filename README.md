@@ -1,3 +1,27 @@
+# API with Symfony without any tool.
+
+    List: GET
+        http://localhost:8000/bookmark/list
+
+    Item: GET
+        http://localhost:8000/bookmark/{id}
+
+    Create: POST
+        http://localhost:8000/bookmark/create
+
+    Delete: DELETE
+        http://localhost:8000/bookmark/delete/{id}
+
+_Construction du JSON dans Postman pour la création d'un bookmark: **BODY / RAW / JSON**_
+
+    {
+        "url": "https://vimeo.com/76979871"
+    }
+
+_Des fixtures sont également à votre disposition pour alimenter rapidement la base de données:_
+
+    php bin/console doctrine:fixtures:load --no-interaction
+
 # Simple Symfony Docker starter
 
 You only need `docker` and `docker-compose` installed
